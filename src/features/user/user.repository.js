@@ -12,13 +12,17 @@ export default class UserRepository {
             const user = new UserModel(name, email, password);
             const collection = db.collection(this.collectionName);
             const result = await collection.insertOne(user);
-            return {success: true, res: result}
+            const insertedUser = await collection.findOne(
+                {_id: result.insertedId},
+                {projection: {password: 0}}
+            )
+            return {success: true, res: insertedUser}
         } catch (error) {
             return{
                 success: false,
                 error: {
                     statusCode: 500,
-                    msg: error.msg
+                    msg: error.message || "Internal Server Error"
                 }
             }
         }
