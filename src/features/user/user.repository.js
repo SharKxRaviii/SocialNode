@@ -1,5 +1,6 @@
 import UserModel from "./user.model.js";
 import { getDB } from "../../db_config/mongodb.js";
+import bcrypt from 'bcrypt';
 
 export default class UserRepository {
     constructor() {
@@ -28,7 +29,46 @@ export default class UserRepository {
         }
     }
 
-    async signInUser() {}
+    async signInUser(email, password) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const user = await collection.findOne(email);
+            if(!user) {
+                return {
+                    success: false,
+                    error: {
+                        statusCode: 404,
+                        msg: "User not found"
+                    }
+                }
+            }
+
+            const comparedPass = await bcrypt.compare(password, user.password);
+            if(comparedPass) {
+                return {
+                    success: true,
+                    res: user
+                }
+            }else {
+                return{
+                    success: false,
+                    error: {
+                        statusCode: 400,
+                        msg: "Incorrect Credentials!!"
+                    }
+                }
+            } 
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 
     async logOutUser() {}
 
