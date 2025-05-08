@@ -1,3 +1,4 @@
+import ErrorHandler from "../../middlewares/appErrorHandler.js";
 import UserRepository from "./user.repository.js";
 import bcrypt from 'bcrypt';
 
@@ -18,7 +19,7 @@ export default class UserController {
                 res: newUser
             });
         } catch (error) {
-            
+            throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
 
@@ -49,7 +50,7 @@ export default class UserController {
                 res: token
             });
         } catch (error) {
-            
+            throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
     

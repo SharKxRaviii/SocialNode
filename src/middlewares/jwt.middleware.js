@@ -10,7 +10,7 @@ export const jwtAuth = (req, res, next) => {
         const payload = jwt.verify(token, process.env.SECRET_KEY);
         console.log("payload:", payload);
         req._id = payload._id;
-        req.user = payload.user;
+        req.name = payload.name;
 
         next();
     } catch (error) {
