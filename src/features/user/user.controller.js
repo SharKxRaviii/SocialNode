@@ -1,4 +1,4 @@
-import ErrorHandler from "../../middlewares/appErrorHandler.js";
+import ErrorHandler from "../../middlewares/appErrorHandler.middleware.js";
 import UserRepository from "./user.repository.js";
 import bcrypt from 'bcrypt';
 
