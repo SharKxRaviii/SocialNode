@@ -27,27 +27,45 @@ export default class UserController {
         const {email, password} = req.body;
 
         try {
-           const user = await this.userRepository.signInUser(email, password);
-           if(!user) {
+           const result = await this.userRepository.signInUser(email, password);
+           if(!result.success) {
             return res.status(400).json({success: false, msg: "Incorrect Credentials!!"});
            }
 
-           const token = jwt.sign(
+           const user = result.res;
+
+           const accessToken = jwt.sign(
             {
                 _id: user._id,
                 name: user.name,
                 email: user.email
             },
-            process.env.SECRET_KEY,
+            process.env.ACCESS_SECRET,
             {
                 algorithm: 'HS256',
-                expiresIn: '1h'
+                expiresIn: '15m'
             }
            );
+
+           const refreshToken = jwt.sign(
+            {
+                _id: user.id,
+                name: user.name,
+                email: user.email
+            },
+            process.env.REFRESH_SECRET,
+            {
+                algorithm: 'HS256',
+                expiresIn: '7d'
+            }
+            );
+
+            // store refresh token
+            res.cookies('refresh-token', refreshToken, {httpOnly: true, secure: true});
             res.status(200).json({
                 success: true,
                 msg: 'User Successfully Signed In',
-                res: token
+                data: {accessToken, user: {...user, password: undefined}}
             });
         } catch (error) {
             throw new ErrorHandler("Server Error ! try again later!!",500);

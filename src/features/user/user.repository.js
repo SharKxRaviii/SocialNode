@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 export default class UserRepository {
     constructor() {
         this.collectionName = 'users';
+        this.tokenCollection = 'tokens';
     }
 
     async signUpUser(name, email, password) {
@@ -33,7 +34,7 @@ export default class UserRepository {
         try {
             const db = getDB();
             const collection = db.collection(this.collectionName);
-            const user = await collection.findOne(email);
+            const user = await collection.findOne({email});
             if(!user) {
                 return {
                     success: false,
