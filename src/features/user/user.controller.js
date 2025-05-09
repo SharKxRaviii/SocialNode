@@ -71,5 +71,19 @@ export default class UserController {
             throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
+
+    async logout(req, res) {
+        const token = req.headers['authorization'];
+        if(!token) {
+            return res.status(401).json({message: 'No token provided'});
+        }
+
+        try {
+            await this.userRepository.logOutUser(token);
+            res.status(200).json({success: true, message: 'Successfully logged out'});
+        } catch (error) {
+            throw new ErrorHandler("Server Error ! try again later!!",500);
+        }
+    }
     
 }
