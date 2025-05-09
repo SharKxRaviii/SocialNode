@@ -15,4 +15,7 @@ userRoutes.post('/signin', (req, res) => {
 userRoutes.post('/logout', (req, res) => {
     userController.logout(req, res);
 });
+userRoutes.post('/logout-all-devices', (req, res) => {
+    userController.logoutAllDevices(req, res);
+});
 export default userRoutes;
