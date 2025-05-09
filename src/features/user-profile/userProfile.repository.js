@@ -36,4 +36,24 @@ export default class UserProfileRepository {
             }
         }
     }
+
+    async allUserDetails () {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const allDetails = await collection.find({}, {projection: {password: 0}}).toArray();
+            return {
+                success: true,
+                res: allDetails
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
