@@ -61,7 +61,7 @@ export default class UserController {
             );
 
             // store refresh token
-            res.cookies('refresh-token', refreshToken, {httpOnly: true, secure: true});
+            res.cookies('refresh_token', refreshToken, {httpOnly: true, secure: true});
             res.status(200).json({
                 success: true,
                 msg: 'User Successfully Signed In',
