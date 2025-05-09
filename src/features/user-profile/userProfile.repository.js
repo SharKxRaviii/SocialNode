@@ -1,0 +1,39 @@
+import { getDB } from "../../db_config/mongodb.js"
+import { ObjectId } from "mongodb";
+
+export default class UserProfileRepository {
+    constructor() {
+        this.collectionName = 'users'
+    }
+
+    async getUserDetailsById(_id) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+
+            const userId = await collection.findOne({_id: new ObjectId(_id)}, {projection: {password: 0}});
+            if(!userId){
+                return {
+                    success: false,
+                    error: {
+                        statusCode: 404,
+                        msg: "User Id not found"
+                    }
+                }
+            }else {
+                return {
+                    success: true,
+                    res: oneUser
+                }
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
+}
