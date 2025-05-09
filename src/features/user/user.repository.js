@@ -71,7 +71,25 @@ export default class UserRepository {
         }
     }
 
-    async logOutUser() {}
+    async logOutUser(token) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.tokenCollection);
+            await collection.deleteOne({token});
+            return {
+                success: true,
+                msg: 'Successfully logged out'
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 
     async logOutAllDevices(){}
 }
