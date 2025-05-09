@@ -1,5 +1,6 @@
 import { getDB } from "../../db_config/mongodb.js"
 import { ObjectId } from "mongodb";
+import bcrypt from 'bcrypt';
 
 export default class UserProfileRepository {
     constructor() {
@@ -45,6 +46,39 @@ export default class UserProfileRepository {
             return {
                 success: true,
                 res: allDetails
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
+
+    async updateDetailsById(_id, updateData) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            
+            // hash the updated password securely
+            if(updateData.password) {
+                const updatedPassword = await bcrypt.hash(updateData.password, 12);
+                updateData.password = updatedPassword;
+            }
+
+            // update the user data
+            const result = await collection.updateOne(
+                {_id: new ObjectId(_id)},
+                {$set: updateData}
+            );
+
+            return {
+                success: true,
+                msg: "User details updated successfully",
+                modifiedCount: result.modifiedCount
             }
         } catch (error) {
             return {
