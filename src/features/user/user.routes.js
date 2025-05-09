@@ -12,5 +12,7 @@ userRoutes.post('/signup', (req, res) => {
 userRoutes.post('/signin', (req, res) => {
     userController.signIn(req, res);
 });
-
+userRoutes.post('/logout', (req, res) => {
+    userController.logout(req, res);
+});
 export default userRoutes;

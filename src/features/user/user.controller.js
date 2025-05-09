@@ -1,10 +1,12 @@
 import ErrorHandler from "../../middlewares/appErrorHandler.middleware.js";
 import UserRepository from "./user.repository.js";
+import TokenRepository from "./token.repository.js";
 import bcrypt from 'bcrypt';
 
 export default class UserController {
     constructor() {
         this.userRepository = new UserRepository();
+        this.tokenRepository = new TokenRepository();
     }
 
     async signUp(req, res) {
@@ -73,16 +75,29 @@ export default class UserController {
     }
 
     async logout(req, res) {
-        const token = req.headers['authorization'];
-        if(!token) {
-            return res.status(401).json({message: 'No token provided'});
-        }
-
         try {
-            await this.userRepository.logOutUser(token);
-            res.status(200).json({success: true, message: 'Successfully logged out'});
-        } catch (error) {
-            throw new ErrorHandler("Server Error ! try again later!!",500);
+            const refreshToken = req.cookies?.refresh_token;
+            if (!refreshToken) return res.status(400).json({ success: false, msg: 'No token provided' });
+
+            await this.tokenRepository.deleteRefreshToken(refreshToken);
+            res.clearCookie('refresh_token');
+            return res.status(200).json({ success: true, msg: 'Logged out from current device' });
+            } catch (err) {
+            return res.status(500).json({ success: false, msg: 'Server error' });
+        }
+    }
+
+    async logoutAllDevices(req, res) {
+        try {
+            const refreshToken = req.cookies?.refresh_token;
+            if (!refreshToken) return res.status(400).json({ success: false, msg: 'No token provided' });
+
+            const payload = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+            await this.tokenRepository.deleteAllTokenForUser(payload._id);
+            res.clearCookie('refresh_token');
+            return res.status(200).json({ success: true, msg: 'Logged out from all devices' });
+            } catch (err) {
+            return res.status(500).json({ success: false, msg: 'Server error' });
         }
     }
     
