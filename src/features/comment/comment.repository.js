@@ -67,4 +67,38 @@ export default class CommentRepository {
             }
         }
     }
+
+    async updateCommentById(_id, userId, postId, updateData) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const updatedComment = await collection.updateOne(
+                {
+                _id: new ObjectId(_id),
+                userId: new ObjectId(userId),
+                postId: new ObjectId(postId)
+                },
+                {$set: updateData}
+            );
+            if(updatedComment.matchedCount === 0) {
+                return {success: false, error: {statusCode: 404, msg: "Comment not found or not authorized"}};
+            }
+
+            const doc = await collection.findOne({_id: new ObjectId(_id)});
+
+            return {
+                success: true,
+                msg: 'Comment updated successfully',
+                res: doc
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
