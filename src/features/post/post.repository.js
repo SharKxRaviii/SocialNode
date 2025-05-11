@@ -1,5 +1,6 @@
 import PostModel from './post.model.js';
 import { getDB } from '../../db_config/mongodb.js';
+import { ObjectId } from 'mongodb';
 
 export default class PostRepository {
     constructor() {
@@ -41,6 +42,22 @@ export default class PostRepository {
                 }
             }
             return {success: true, res: userId};
+        } catch (error) {
+            return {
+                succes: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
+
+    async getAllPostById(userId) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            await collection.find({userId});
         } catch (error) {
             return {
                 succes: false,
