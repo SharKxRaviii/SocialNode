@@ -41,4 +41,30 @@ export default class CommentRepository {
             }
         }
     }
+
+    async addComment(userId, postId, commentText) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const newComment = new CommentModel(
+                new ObjectId(userId),
+                new ObjectId(postId),
+                commentText
+            );
+            const comment = await collection.insertOne(newComment);
+            const insertedComment = await collection.findOne({_id: comment.insertedId});
+            return {
+                success: true,
+                res: insertedComment
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
