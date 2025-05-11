@@ -19,4 +19,16 @@ export default class UserProfileController {
             throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
+
+    async allUserDetails (req, res) {
+        try {
+            const allUsers = await this.userProfileRepository.allUserDetails();
+            if(!allUsers.success) {
+                return res.status(allUsers.error.statusCode).json({success: false, msg: allUsers.error.msg});
+            }
+            res.status(200).json({success: true, res: allUsers.res});
+        } catch (error) {
+            throw new ErrorHandler("Server Error ! try again later!!",500);
+        }
+    }
 }
