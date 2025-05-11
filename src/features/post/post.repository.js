@@ -87,4 +87,29 @@ export default class PostRepository {
             }
         }
     }
+
+    async updatePostById(_id, userId, postData) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const updatedPost = await collection.updateOne({_id: new ObjectId(_id), userId}, {$set: postData});
+
+            if(updatedPost.matchedCount === 0) {
+                return {success: false, error: {statusCode: 404, msg: 'Post not found or not authorized'}};
+            }
+            return {
+                success: true,
+                msg: 'Post Updated Successfully',
+                res: updatedPost
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
