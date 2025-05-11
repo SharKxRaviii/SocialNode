@@ -101,4 +101,42 @@ export default class CommentRepository {
             }
         }
     }
+
+    async deleteCommentById(_id, userId, postId) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const result = await collection.deleteOne(
+                {
+                    _id: new ObjectId(_id),
+                    userId: new ObjectId(userId),
+                    postId: new ObjectId(postId)
+                }
+            );
+
+            if(result.deletedCount === 0) {
+                return {
+                    success: false,
+                    error: {
+                        statusCode: 404,
+                        msg: "Comment not found or not authorized"
+                    }
+                }
+            }
+
+            return {
+                success: true,
+                msg: "Comment deleted successfully"
+            }
+
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
