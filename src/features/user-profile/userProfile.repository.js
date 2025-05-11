@@ -24,7 +24,7 @@ export default class UserProfileRepository {
             }else {
                 return {
                     success: true,
-                    res: userId
+                    res: oneUser
                 }
             }
         } catch (error) {
