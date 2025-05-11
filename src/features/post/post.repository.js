@@ -18,7 +18,7 @@ export default class PostRepository {
             }
         } catch (error) {
             return {
-                succes: false,
+                success: false,
                 error: {
                     statusCode: 500,
                     msg: error.message
@@ -44,7 +44,7 @@ export default class PostRepository {
             return {success: true, res: userId};
         } catch (error) {
             return {
-                succes: false,
+                success: false,
                 error: {
                     statusCode: 500,
                     msg: error.message
@@ -60,7 +60,26 @@ export default class PostRepository {
             await collection.find({userId});
         } catch (error) {
             return {
-                succes: false,
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
+
+    async createNewPost(userId, imageUrl, caption) {
+        try {
+            const db = getDB();
+            const postModel = new PostModel(userId, imageUrl, caption);
+            const collection = db.collection(this.collectionName);
+            const post = await collection.insertOne(postModel);
+            const insertedPost = await collection.findOne({_id: new ObjectId(post.insertedId)});
+            return {success: true, res: insertedPost};
+        } catch (error) {
+            return {
+                success: false,
                 error: {
                     statusCode: 500,
                     msg: error.message
