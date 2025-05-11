@@ -31,4 +31,19 @@ export default class UserProfileController {
             throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
+
+    async updateDetailsById (req, res) {
+        const {userId} = req.params;
+        const userData = req.body;
+
+        try {
+            const updatedData = await this.userProfileRepository.updateDetailsById(userId, userData);
+            if(!updatedData.success) {
+                return res.status(updatedData.error.statusCode).json({success: false, msg: updatedData.error.msg});
+            }
+            res.status(200).json({success: true, msg: updatedData.msg , res: updatedData.modifiedCount});
+        } catch (error) {
+            throw new ErrorHandler("Server Error ! try again later!!",500);
+        }
+    }
 }
