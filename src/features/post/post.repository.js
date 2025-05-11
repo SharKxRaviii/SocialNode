@@ -25,4 +25,30 @@ export default class PostRepository {
             }
         }
     }
+
+    async getPostById(_id) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const userId = await collection.findOne({_id: new ObjectId(_id)});
+            if(!userId) {
+                return {
+                    success: false,
+                    error: {
+                        statusCode: 404,
+                        msg: error.message
+                    }
+                }
+            }
+            return {success: true, res: userId};
+        } catch (error) {
+            return {
+                succes: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
