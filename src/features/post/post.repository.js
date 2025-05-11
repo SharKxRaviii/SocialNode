@@ -112,4 +112,33 @@ export default class PostRepository {
             }
         }
     }
+
+    async deletePostById(_id, userId) {
+        try {
+            const db = getDB();
+            const collection = db.collection(this.collectionName);
+            const result = await collection.deleteOne({_id: new ObjectId(_id), userId});
+            if(result.deletedCount  === 0) {
+                return {
+                    success: false,
+                    error: {
+                        statusCode: 404,
+                        msg: 'Post not found or user unauthorized'
+                    }
+                }
+            }
+            return {
+                success: true,
+                msg: "Post deleted successfully"
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: {
+                    statusCode: 500,
+                    msg: error.message
+                }
+            }
+        }
+    }
 }
