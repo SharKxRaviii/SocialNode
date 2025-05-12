@@ -18,4 +18,18 @@ export default class LikeController {
             throw new ErrorHandler("Server Error ! try again later!!",500);
         }
     }
+
+    async toggleLike(req, res) {
+        const {userId, postId} = req.body;
+
+        try {
+            const like = await this.likeRepository.togglePostLike(userId, postId);
+            if(like.res) {
+                return res.status(201).json({success: true, msg: like.msg, res: like.res});
+            }
+            return res.status(200).json({success: true, res: like.msg});
+        } catch (error) {
+            throw new ErrorHandler("Server Error ! try again later!!",500);
+        }
+    }
 }
