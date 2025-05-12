@@ -7,11 +7,11 @@ export default class LikeRepository {
         this.collectionName = "likes";
     }
 
-    async getPostLikeById(userId, postId) {
+    async getPostLikeById(_id,userId, postId) {
         try {
             const db = getDB();
             const collection = db.collection(this.collectionName);
-            const like = await collection.findOne({userId: new ObjectId(userId), postId: new ObjectId(postId)});
+            const like = await collection.findOne({_id: new ObjectId(_id), userId: new ObjectId(userId), postId: new ObjectId(postId)});
             return {success: true, res: like};
         } catch (error) {
             return {
@@ -24,11 +24,11 @@ export default class LikeRepository {
         }
     }
 
-    async togglePostLike(userId, postId) {
+    async togglePostLike(_id, userId, postId) {
         try {
             const db = getDB();
             const collection = db.collection(this.collectionName);
-            const existingLike = await collection.findOne({userId: new ObjectId(userId), postId: new ObjectId(postId)});
+            const existingLike = await collection.findOne({_id: new ObjectId(_id), userId: new ObjectId(userId), postId: new ObjectId(postId)});
             if(existingLike) {
                 await collection.deleteOne({_id: existingLike._id});
                 return {success: true, msg: "Post unlike successfully"};

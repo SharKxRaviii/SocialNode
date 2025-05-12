@@ -7,9 +7,10 @@ export default class LikeController {
     }
 
     async postLikeById(req, res) {
+        const {id} = req.params;
         const {userId, postId} = req.body;
         try {
-            const like = await this.likeRepository.getPostLikeById(userId, postId);
+            const like = await this.likeRepository.getPostLikeById(id, userId, postId);
             if(!like.success) {
                 return res.status(404).json({success: false, msg: "postId not found"});
             }
@@ -20,10 +21,11 @@ export default class LikeController {
     }
 
     async toggleLike(req, res) {
+        const {id} = req.params;
         const {userId, postId} = req.body;
 
         try {
-            const like = await this.likeRepository.togglePostLike(userId, postId);
+            const like = await this.likeRepository.togglePostLike(id, userId, postId);
             if(like.res) {
                 return res.status(201).json({success: true, msg: like.msg, res: like.res});
             }
