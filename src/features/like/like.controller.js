@@ -8,7 +8,8 @@ export default class LikeController {
 
     async postLikeById(req, res) {
         const {id} = req.params;
-        const {userId, postId} = req.body;
+        const {postId} = req.body;
+        const userId = req._id;
         try {
             const like = await this.likeRepository.getPostLikeById(id, userId, postId);
             if(!like.success) {
@@ -22,7 +23,8 @@ export default class LikeController {
 
     async toggleLike(req, res) {
         const {id} = req.params;
-        const {userId, postId} = req.body;
+        const {postId} = req.body;
+        const userId = req._id;
 
         try {
             const like = await this.likeRepository.togglePostLike(id, userId, postId);

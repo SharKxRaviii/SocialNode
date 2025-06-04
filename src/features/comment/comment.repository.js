@@ -1,5 +1,5 @@
 import CommentModel from './comment.model.js';
-import getDB from '../../db_config/mongodb.js';
+import {getDB} from '../../db_config/mongodb.js';
 import { ObjectId } from 'mongodb';
 
 export default class CommentRepository {

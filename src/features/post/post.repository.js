@@ -37,7 +37,7 @@ export default class PostRepository {
                     success: false,
                     error: {
                         statusCode: 404,
-                        msg: error.message
+                        msg: "Post not found"
                     }
                 }
             }
@@ -53,21 +53,26 @@ export default class PostRepository {
         }
     }
 
-    async getAllPostById(userId) {
-        try {
-            const db = getDB();
-            const collection = db.collection(this.collectionName);
-            await collection.find({userId});
-        } catch (error) {
-            return {
-                success: false,
-                error: {
-                    statusCode: 500,
-                    msg: error.message
-                }
+    async getProfilePost(userId) {
+    try {
+        const db = getDB();
+        const collection = db.collection(this.collectionName);
+        const posts = await collection.find({ userId }).toArray();
+        return {
+            success: true,
+            res: posts
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: {
+                statusCode: 500,
+                msg: error.message
             }
         }
     }
+}
+
 
     async createNewPost(userId, imageUrl, caption) {
         try {

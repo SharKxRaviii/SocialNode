@@ -2,6 +2,7 @@ import ErrorHandler from "../../middlewares/appErrorHandler.middleware.js";
 import UserRepository from "./user.repository.js";
 import TokenRepository from "./token.repository.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export default class UserController {
     constructor() {
@@ -26,17 +27,18 @@ export default class UserController {
     }
 
     async signIn(req, res) {
-        const {email, password} = req.body;
+    const { email, password } = req.body;
 
-        try {
-           const result = await this.userRepository.signInUser(email, password);
-           if(!result.success) {
-            return res.status(400).json({success: false, msg: "Incorrect Credentials!!"});
-           }
+    try {
+        const result = await this.userRepository.signInUser(email, password);
 
-           const user = result.res;
+        if (!result.success) {
+            return res.status(400).json({ success: false, msg: "Incorrect Credentials!!" });
+        }
 
-           const accessToken = jwt.sign(
+        const user = result.res;
+
+        const accessToken = jwt.sign(
             {
                 _id: user._id,
                 name: user.name,
@@ -47,11 +49,11 @@ export default class UserController {
                 algorithm: 'HS256',
                 expiresIn: '15m'
             }
-           );
+        );
 
-           const refreshToken = jwt.sign(
+        const refreshToken = jwt.sign(
             {
-                _id: user.id,
+                _id: user._id,
                 name: user.name,
                 email: user.email
             },
@@ -60,19 +62,34 @@ export default class UserController {
                 algorithm: 'HS256',
                 expiresIn: '7d'
             }
-            );
+        );
 
-            // store refresh token
-            res.cookies('refresh_token', refreshToken, {httpOnly: true, secure: true});
-            res.status(200).json({
-                success: true,
-                msg: 'User Successfully Signed In',
-                data: {accessToken, user: {...user, password: undefined}}
-            });
-        } catch (error) {
-            throw new ErrorHandler("Server Error ! try again later!!",500);
-        }
+        // Set refresh token as HTTP-only cookie
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        const { password: _, ...safeUser } = user;
+
+        return res.status(200).json({
+            success: true,
+            msg: 'User Successfully Signed In',
+            data: { accessToken, user: safeUser }
+        });
+
+    } catch (error) {
+        console.error("SignIn error:", error);
+        return res.status(500).json({
+            success: false,
+            msg: "Server Error! Try again later."
+        });
     }
+}
+
 
     async logout(req, res) {
         try {
